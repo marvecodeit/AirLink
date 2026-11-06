@@ -5,8 +5,9 @@ on:
     tags:
       - "v*"
 
+# Least privilege: individual jobs opt into more only where necessary.
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: airlink-release-${{ github.ref }}
@@ -15,13 +16,20 @@ concurrency:
 jobs:
   validate:
     name: Validate version tag
-    runs-on: ubuntu-latest
+    # Stable releases only. Prerelease tags such as v1.1.0-beta.1 must not be
+    # published to the stable update feed.
+    if: ${{ !contains(github.ref_name, '-') }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
-      - name: Verify tag matches Tauri version
+      - name: Verify tag matches every version source
         run: |
           set -euo pipefail
           TAURI_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
@@ -50,42 +58,49 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - runner: macos-13
+          # GitHub retired the macOS 13 Intel image. macos-15-intel is the
+          # current native Intel runner; macos-15 is the arm64 runner.
+          - runner: macos-15-intel
             target: x86_64-apple-darwin
             arch: intel-x86_64
-          - runner: macos-14
+          - runner: macos-15
             target: aarch64-apple-darwin
             arch: apple-silicon-arm64
     runs-on: ${{ matrix.runner }}
-    env:
-      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
 
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
           targets: ${{ matrix.target }}
 
-      - uses: Swatinem/rust-cache@v2
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@2201cc584a476d1b508be977bbe4b7d1c7a52e9c # v2.9.3
         with:
           workspaces: src-tauri
 
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Type check and test
+      - name: Frontend checks
         run: |
           npm run typecheck
+          npm run lint
           npm test
 
-      - name: Build, sign and release draft
-        uses: tauri-apps/tauri-action@v1
+      - name: Rust checks
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Build, sign and draft release
+        uses: tauri-apps/tauri-action@944946e3e4cac6603d1fe8f514171e9ecd3c78aa # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -102,7 +117,7 @@ jobs:
   publish:
     name: Publish verified release
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:

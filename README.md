@@ -106,15 +106,17 @@ Beta is a separate app with its own settings and data. It installs as
 
 `build:mac:stable` and `build:mac:beta` are signed updater release builds and
 require `TAURI_SIGNING_PRIVATE_KEY` plus its password. For a local in-place
-build without updater artifacts use `npm run build:mac:local`.
+build without updater artifacts use `npm run build:mac:local` (`.app` only) or
+`npm run build:mac:dmg` for a local disk image.
 
 ```bash
-# macOS release builds (signed updater artifacts)
+# macOS release builds (signed updater artifacts + DMG)
 npm run build:mac:stable
 npm run build:mac:beta
 
 # Local in-place build (no updater signing required)
 npm run build:mac:local
+npm run build:mac:dmg
 
 # Linux (.deb + .AppImage)
 npm run build:linux:stable

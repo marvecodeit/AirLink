@@ -88,16 +88,21 @@ Trigger: pushing a version tag such as `v1.0.1`.
 
 It:
 
-1. validates that the tag, `package.json` version, and `tauri.conf.json` version
-   all match;
-2. builds Intel (`x86_64-apple-darwin` on `macos-13`) and Apple Silicon
-   (`aarch64-apple-darwin` on `macos-14`) artifacts;
+1. validates that the tag, `package.json` version, `tauri.conf.json` version, and
+   `Cargo.toml` version all match;
+2. builds Intel (`x86_64-apple-darwin` on `macos-15-intel`) and Apple Silicon
+   (`aarch64-apple-darwin` on `macos-15`) artifacts;
 3. signs updater bundles with `TAURI_SIGNING_PRIVATE_KEY`;
 4. creates a **draft** GitHub Release and uploads installers, `.app.tar.gz`
    updater bundles, `.sig` signatures, and `latest.json`;
 5. publishes the draft only after both architecture builds succeed.
 
-Ordinary pushes to `main` do not create a release. Only `v*` tags do.
+Ordinary pushes to `main` do not create a release. Only stable `v*` tags do.
+Prerelease tags containing a hyphen (for example `v1.1.0-beta.1`) are rejected by
+the stable workflow so they can never overwrite the stable feed.
+
+Third-party actions are pinned to commit SHAs. The workflow uses the built-in
+`GITHUB_TOKEN` with `contents: write` only for the build and publish jobs.
 
 The existing Linux build workflow is preserved separately in
 `.github/workflows/release-linux.yml` and runs manually.
@@ -131,9 +136,14 @@ The tag push triggers the macOS release workflow. Do not create the GitHub
 Release manually with different assets; let the workflow publish it.
 
 The Beta channel (`src-tauri/release/beta.conf.json`) uses a separate bundle
-identifier. Its automatic update feed is **not yet wired** to a separate beta
-manifest; do not point Beta clients at stable releases without deciding on a
-channel policy.
+identifier, product name, and version. It is configured to read a rolling
+`beta` GitHub Release at
+`https://github.com/marvecodeit/AirLink/releases/download/beta/latest.json`.
+No beta release has been published yet, so that URL currently returns 404. Do
+not point Beta clients at the stable `releases/latest` feed: that would install
+the stable bundle over the beta app. A dedicated beta publishing workflow can
+be added when the beta channel is ready to ship; until then beta builds are for
+local, side-by-side testing.
 
 ## Updating an installed copy manually
 
@@ -205,3 +215,53 @@ gh auth login
 
 Or use Git over HTTPS with a credential helper / SSH key. Never paste a personal
 access token into a tracked file.
+
+## Remaining one-time setup checklist
+
+These steps require your GitHub account and were intentionally not performed
+without approval:
+
+1. Authenticate GitHub CLI:
+
+   ```bash
+   brew install gh
+   gh auth login
+   ```
+
+2. Add the updater secrets without printing them:
+
+   ```bash
+   gh secret set TAURI_SIGNING_PRIVATE_KEY \
+     --repo marvecodeit/AirLink < ~/.tauri/airlink.key
+   gh secret set TAURI_SIGNING_PRIVATE_KEY_PASSWORD \
+     --repo marvecodeit/AirLink < ~/.tauri/airlink.key.password
+   ```
+
+3. Review and push the prepared commits:
+
+   ```bash
+   git status
+   git log --oneline origin/main..main
+   git push origin main
+   ```
+
+4. Publish the first release. The repository is currently at `1.0.0`. Either
+   tag that version once, or bump straight to the first new version:
+
+   ```bash
+   ./scripts/bump-version.sh 1.0.1
+   git add .
+   git commit -m "Release v1.0.1"
+   git tag v1.0.1
+   git push origin main
+   git push origin v1.0.1
+   ```
+
+5. Watch the **Actions** tab. The workflow creates a draft release, uploads
+   Intel and Apple Silicon assets, and publishes it only after both builds pass.
+
+6. Test the update from the installed `1.0.0` build in
+   **Settings → Software Updates**.
+
+Until steps 1–5 are done, the updater endpoint returns 404 and the in-app check
+will report a network/404 error. That is expected and is not simulated success.

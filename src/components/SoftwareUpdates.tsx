@@ -46,6 +46,7 @@ export function SoftwareUpdates() {
   const appInfo = useAppStore((state) => state.appInfo);
   const [phase, setPhase] = useState<Phase>("idle");
   const [update, setUpdate] = useState<Update | null>(null);
+  const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [lastChecked, setLastChecked] = useState<string | null>(null);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,9 +72,11 @@ export function SoftwareUpdates() {
       if (result) {
         updateRef.current = result;
         setUpdate(result);
+        setLatestVersion(result.version);
         setPhase("available");
       } else {
         setUpdate(null);
+        setLatestVersion(appInfo?.version ?? null);
         setPhase("up-to-date");
       }
     } catch (updateError) {
@@ -122,8 +125,9 @@ export function SoftwareUpdates() {
     try {
       await relaunch();
     } catch (relaunchError) {
+      // The update is already installed; keep the restart action available.
       setError(messageFrom(relaunchError));
-      setPhase("error");
+      setPhase("restart-required");
     }
   };
 
@@ -163,7 +167,7 @@ export function SoftwareUpdates() {
             Latest available
           </p>
           <p className="mt-1 font-mono text-[12px] text-ink">
-            {update?.version ?? "—"}
+            {latestVersion ?? "—"}
           </p>
         </div>
         <div className="rounded-lg border border-hairline bg-surface-muted/50 px-3 py-2.5">

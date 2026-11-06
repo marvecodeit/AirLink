@@ -20,8 +20,9 @@
     "build:linux:stable": "tauri build --bundles deb,appimage --config src-tauri/release/stable.conf.json",
     "build:linux:beta": "tauri build --bundles deb,appimage --config src-tauri/release/beta.conf.json",
     "update:app:beta": "npm run build:mac:beta && AIRLINK_APP_NAME=\"AirLink Beta\" AIRLINK_SOURCE_APP=\"$PWD/src-tauri/target/release/bundle/macos/AirLink Beta.app\" AIRLINK_INSTALL_PATH=\"/Applications/AirLink Beta.app\" AIRLINK_LEGACY_DEST=\"\" ./scripts/update-installed-app.sh",
-    "build:mac:local": "tauri build --bundles app,dmg",
-    "version:bump": "./scripts/bump-version.sh"
+    "build:mac:local": "tauri build --bundles app",
+    "version:bump": "./scripts/bump-version.sh",
+    "build:mac:dmg": "tauri build --bundles dmg"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.12.4",
