@@ -26,12 +26,17 @@ jobs:
           set -euo pipefail
           TAURI_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          CARGO_VERSION=$(awk '/^name = "airlink"$/{found=1} found && /^version = /{gsub(/"/, "", $3); print $3; exit}' src-tauri/Cargo.toml)
           test "$GITHUB_REF_NAME" = "v$TAURI_VERSION" || {
             echo "Tag $GITHUB_REF_NAME does not match tauri version $TAURI_VERSION" >&2
             exit 1
           }
           test "$PACKAGE_VERSION" = "$TAURI_VERSION" || {
             echo "package.json $PACKAGE_VERSION does not match tauri version $TAURI_VERSION" >&2
+            exit 1
+          }
+          test "$CARGO_VERSION" = "$TAURI_VERSION" || {
+            echo "Cargo.toml $CARGO_VERSION does not match tauri version $TAURI_VERSION" >&2
             exit 1
           }
 
