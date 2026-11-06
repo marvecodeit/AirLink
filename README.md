@@ -10,6 +10,22 @@ It is a local utility. There is no account, no cloud backend, no analytics, and 
 
 ---
 
+## Download
+
+| Mac | Installer |
+| --- | --- |
+| Apple Silicon (M1 and later) | [AirLink 1.0.0 for Apple Silicon](https://github.com/marvecodeit/AirLink/releases/download/v1.0.0/AirLink_1.0.0_aarch64.dmg) |
+| Intel | [AirLink 1.0.0 for Intel](https://github.com/marvecodeit/AirLink/releases/download/v1.0.0/AirLink_1.0.0_x64.dmg) |
+
+[All releases and SHA-256 checksums](https://github.com/marvecodeit/AirLink/releases)
+
+The 1.0.0 builds are ad-hoc signed and not notarized. On first launch macOS
+may block the app; right-click AirLink in Finder and choose **Open**, or allow
+it in **System Settings → Privacy & Security**. Automatic updates are signed
+separately with the AirLink updater key and verified before installation.
+
+---
+
 ## What it does
 
 - Reads the active Wi-Fi link with CoreWLAN and native macOS networking data:
