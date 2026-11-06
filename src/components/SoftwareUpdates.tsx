@@ -42,7 +42,7 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function SoftwareUpdates() {
+export function SoftwareUpdates({ embedded = false }: { embedded?: boolean }) {
   const appInfo = useAppStore((state) => state.appInfo);
   const [phase, setPhase] = useState<Phase>("idle");
   const [update, setUpdate] = useState<Update | null>(null);
@@ -137,8 +137,8 @@ export function SoftwareUpdates() {
       ? Math.min(100, Math.round((progress.downloaded / progress.total) * 100))
       : null;
 
-  return (
-    <Card className="p-5" id="software-updates">
+  const body = (
+    <>
       <div className="flex items-start gap-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-muted text-ink-secondary">
           <RefreshCw className="h-4 w-4" strokeWidth={1.8} />
@@ -302,6 +302,20 @@ export function SoftwareUpdates() {
         verified against the updater public key embedded in this build. AirLink
         never installs an unsigned update.
       </p>
+    </>
+  );
+
+  if (embedded) {
+    return (
+      <div id="software-updates" className="mt-4 border-t border-hairline pt-4">
+        {body}
+      </div>
+    );
+  }
+
+  return (
+    <Card className="p-5" id="software-updates">
+      {body}
     </Card>
   );
 }

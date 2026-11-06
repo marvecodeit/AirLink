@@ -316,9 +316,9 @@ function SettingsContent({ settings }: { settings: Settings }) {
           {appInfo?.copyright ??
             "© 2026 marvecodeit"}
         </p>
-      </Section>
 
-      {appInfo?.platform === "linux" ? null : <SoftwareUpdates />}
+        {appInfo?.platform === "linux" ? null : <SoftwareUpdates embedded />}
+      </Section>
     </div>
   );
 }

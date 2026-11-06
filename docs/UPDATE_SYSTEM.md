@@ -16,7 +16,7 @@ release is not trusted merely because it is hosted on GitHub.
 - Release config: `src-tauri/release/stable.conf.json`
 - Updater artifacts: generated only by release builds (`createUpdaterArtifacts`).
 
-The updater UI lives at **Settings → Software Updates** (directly after About).
+The updater UI lives at **Settings → About → Software Updates**.
 It uses the real `@tauri-apps/plugin-updater` API for check, download, progress,
 signature verification, install, and relaunch. No update state is simulated.
 
@@ -160,7 +160,7 @@ merges the app in place. It is not a substitute for testing the signed updater.
 
 1. Publish a real release with the workflow, for example `v1.0.1`.
 2. Install the previous signed version (`v1.0.0`) on a Mac.
-3. Open **Settings → Software Updates**.
+3. Open **Settings → About → Software Updates**.
 4. Click **Check for Updates**.
 5. Confirm the version, release notes, download progress, signature
    verification, installation, and **Restart to Update**.
@@ -261,7 +261,7 @@ without approval:
    Intel and Apple Silicon assets, and publishes it only after both builds pass.
 
 6. Test the update from the installed `1.0.0` build in
-   **Settings → Software Updates**.
+   **Settings → About → Software Updates**.
 
 Until steps 1–5 are done, the updater endpoint returns 404 and the in-app check
 will report a network/404 error. That is expected and is not simulated success.

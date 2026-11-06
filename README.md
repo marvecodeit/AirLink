@@ -40,7 +40,7 @@ It is a local utility. There is no account, no cloud backend, no analytics, and 
   is enabled.
 - **Signed automatic updates** through the Tauri updater and GitHub Releases,
   with check, release notes, download progress, signature verification, install,
-  and restart available in **Settings → Software Updates**.
+  and restart available in **Settings → About → Software Updates**.
 
 ## What it deliberately does not do
 
@@ -189,7 +189,7 @@ AIRLINK_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)" \
 You can override the install location with `AIRLINK_INSTALL_PATH`.
 
 > For a real signed updater test, publish a version tag through the release
-> workflow and run **Settings → Software Updates** from the previous signed
+> workflow and run **Settings → About → Software Updates** from the previous signed
 > build. A local `npm run update:app` is only an in-place development install; it
 > does not test the updater feed. See [docs/UPDATE_SYSTEM.md](docs/UPDATE_SYSTEM.md).
 
