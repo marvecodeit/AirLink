@@ -1,0 +1,51 @@
+{
+  "name": "airlink",
+  "private": true,
+  "version": "1.0.0",
+  "description": "AirLink \u2014 a native macOS captive portal assistant by marvecodeit",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "lint": "biome lint src vite.config.ts",
+    "update:app": "npm run build:mac:local && ./scripts/update-installed-app.sh",
+    "build:stable": "tauri build --config src-tauri/release/stable.conf.json",
+    "build:beta": "tauri build --config src-tauri/release/beta.conf.json",
+    "build:mac:stable": "tauri build --bundles app,dmg --config src-tauri/release/stable.conf.json",
+    "build:mac:beta": "tauri build --bundles app,dmg --config src-tauri/release/beta.conf.json",
+    "build:linux:stable": "tauri build --bundles deb,appimage --config src-tauri/release/stable.conf.json",
+    "build:linux:beta": "tauri build --bundles deb,appimage --config src-tauri/release/beta.conf.json",
+    "update:app:beta": "npm run build:mac:beta && AIRLINK_APP_NAME=\"AirLink Beta\" AIRLINK_SOURCE_APP=\"$PWD/src-tauri/target/release/bundle/macos/AirLink Beta.app\" AIRLINK_INSTALL_PATH=\"/Applications/AirLink Beta.app\" AIRLINK_LEGACY_DEST=\"\" ./scripts/update-installed-app.sh",
+    "build:mac:local": "tauri build --bundles app,dmg",
+    "version:bump": "./scripts/bump-version.sh"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-autostart": "^2.7.0",
+    "@tauri-apps/plugin-notification": "^2.8.0",
+    "@tauri-apps/plugin-opener": "^2.7.2",
+    "@tauri-apps/plugin-process": "^2.4.0",
+    "@tauri-apps/plugin-updater": "^2.14.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.68.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwindcss": "^4.3.4",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.5",
+    "@tailwindcss/vite": "^4.3.4",
+    "@tauri-apps/cli": "^2.12.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "productName": "AirLink",
+  "identifier": "com.marveltech.wifiwizard",
+  "bundle": {
+    "createUpdaterArtifacts": true
+  }
+}

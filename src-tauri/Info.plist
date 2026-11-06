@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSLocationUsageDescription</key>
+  <string>AirLink uses your location permission only to read the name of the Wi-Fi network you are connected to. macOS restricts Wi-Fi network names unless an app has Location access. Your location is never recorded or sent anywhere.</string>
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>AirLink uses your location permission only to read the name of the Wi-Fi network you are connected to. Your location is never recorded or sent anywhere.</string>
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>AirLink connects to your campus network's local captive portal so you can sign in and verify your internet connection.</string>
+  <key>NSHumanReadableCopyright</key>
+  <string>© 2026 marvecodeit</string>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsArbitraryLoadsInWebContent</key>
+    <true/>
+    <key>NSAllowsLocalNetworking</key>
+    <true/>
+  </dict>
+</dict>
+</plist>

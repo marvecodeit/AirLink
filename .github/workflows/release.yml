@@ -1,0 +1,107 @@
+name: Release AirLink for macOS
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: airlink-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate version tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify tag matches Tauri version
+        run: |
+          set -euo pipefail
+          TAURI_VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          test "$GITHUB_REF_NAME" = "v$TAURI_VERSION" || {
+            echo "Tag $GITHUB_REF_NAME does not match tauri version $TAURI_VERSION" >&2
+            exit 1
+          }
+          test "$PACKAGE_VERSION" = "$TAURI_VERSION" || {
+            echo "package.json $PACKAGE_VERSION does not match tauri version $TAURI_VERSION" >&2
+            exit 1
+          }
+
+  build:
+    name: ${{ matrix.arch }}
+    needs: validate
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - runner: macos-13
+            target: x86_64-apple-darwin
+            arch: intel-x86_64
+          - runner: macos-14
+            target: aarch64-apple-darwin
+            arch: apple-silicon-arm64
+    runs-on: ${{ matrix.runner }}
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Type check and test
+        run: |
+          npm run typecheck
+          npm test
+
+      - name: Build, sign and release draft
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: v__VERSION__
+          releaseName: AirLink v__VERSION__
+          releaseBody: ""
+          generateReleaseNotes: true
+          releaseDraft: true
+          prerelease: false
+          args: --target ${{ matrix.target }} --config src-tauri/release/stable.conf.json
+
+  publish:
+    name: Publish verified release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "$GITHUB_REF_NAME" --draft=false

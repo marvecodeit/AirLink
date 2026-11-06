@@ -1,0 +1,77 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "AirLink",
+  "version": "1.0.0",
+  "identifier": "com.marveltech.wifiwizard",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "AirLink",
+        "width": 1180,
+        "height": 788,
+        "minWidth": 980,
+        "minHeight": 660,
+        "center": true,
+        "resizable": true,
+        "fullscreen": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "backgroundColor": "#F6F8FA"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: asset: http://asset.localhost; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost; font-src 'self' data:",
+      "devCsp": "default-src 'self'; img-src 'self' data: asset: http://asset.localhost; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; connect-src 'self' ipc: http://ipc.localhost ws://localhost:1421 http://localhost:1420"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "Utility",
+    "shortDescription": "Campus Wi-Fi & captive portal assistant",
+    "longDescription": "AirLink helps you connect to open campus Wi-Fi networks with captive portals. It detects portal interception, opens a secure built-in browser, and verifies that your Mac actually has internet access.",
+    "copyright": "\u00a9 2026 marvecodeit",
+    "macOS": {
+      "minimumSystemVersion": "12.0",
+      "entitlements": "entitlements.plist",
+      "infoPlist": "Info.plist",
+      "dmg": {
+        "windowSize": {
+          "width": 660,
+          "height": 440
+        },
+        "appPosition": {
+          "x": 180,
+          "y": 190
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 190
+        }
+      },
+      "signingIdentity": "-"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU0RjEzODczMDE2QjYwNzgKUldSNFlHc0Jjemp4VkNJZWxwb2NoTDJ4dWFPRk5iMk1LaFB4eWc5VzV1VmZEWlhGcHJwQ0FKYTcK",
+      "endpoints": [
+        "https://github.com/marvecodeit/AirLink/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}

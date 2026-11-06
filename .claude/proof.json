@@ -1,0 +1,15 @@
+{
+  "checks": [
+    { "name": "types", "run": "npm run typecheck" },
+    { "name": "lint", "run": "npm run lint" },
+    { "name": "test", "run": "npm test" },
+    {
+      "name": "rust-tests",
+      "run": "cargo test --manifest-path src-tauri/Cargo.toml"
+    },
+    {
+      "name": "rust-lint",
+      "run": "cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings"
+    }
+  ]
+}

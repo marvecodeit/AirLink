@@ -1,0 +1,9 @@
+pub mod browser;
+pub mod captive_portal;
+pub mod credentials;
+pub mod diagnostics;
+pub mod hotspot;
+pub mod network;
+pub mod settings;
+pub mod super_dev;
+pub mod wifi;
